@@ -17,14 +17,14 @@ const io = new Server(server, {
 const userManager = new UserManager();
 
 io.on('connection', (socket: Socket) => {
-  console.log('a user connected');
+  console.log('User connected');
   userManager.addUser("randomName", socket);
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("User disconnected");
     userManager.removeUser(socket.id);
   })
 });
 
 server.listen(3000, () => {
-    console.log('listening on *:3000');
+    console.log('Server running:3000');
 });

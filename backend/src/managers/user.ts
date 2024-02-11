@@ -22,6 +22,7 @@ export class UserManager {
       socket,
     });
     this.queue.push(socket.id);
+    socket.emit("lobby");
     this.matchQueue();
     this.initHandlers(socket);
   }
@@ -45,16 +46,21 @@ export class UserManager {
       return;
     }
     console.log("Creating room");
+    const room = this.roomManager.createRoom(user1, user2);
     this.matchQueue();
   }
 
   initHandlers(socket: Socket) {
-    socket.on("offer", ({sdp, roomId}: {sdp: string, roomId: string}) => {
-        this.roomManager.onRequest(roomId, sdp, socket.id);
-    })
+    socket.on("request", ({ sdp, roomId }: { sdp: string; roomId: string }) => {
+      this.roomManager.onRequest(roomId, sdp, socket.id);
+    });
 
-    socket.on("answer",({sdp, roomId}: {sdp: string, roomId: string}) => {
-        this.roomManager.onAnswer(roomId, sdp, socket.id);
-    })
+    socket.on("answer", ({ sdp, roomId }: { sdp: string; roomId: string }) => {
+      this.roomManager.onAnswer(roomId, sdp, socket.id);
+    });
+
+    socket.on("add-ice-candidate", ({ candidate, roomId, type }) => {
+      this.roomManager.onIceCandidates(roomId, socket.id, candidate, type);
+    });
   }
 }
